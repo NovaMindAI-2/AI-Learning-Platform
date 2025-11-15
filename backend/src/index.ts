@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes';
 import profileRoutes from './routes/profile.routes';
 import curriculumRoutes from './routes/curriculum.routes';
 import dashboardRoutes from './routes/dashboard.routes';
+import voiceRoutes from './routes/voice.routes';
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/curriculum', curriculumRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/voice', voiceRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -4,6 +4,7 @@ import TutorLayout from '@/components/TutorLayout';
 import AITutorVisual from '@/components/AITutorVisual';
 import VoiceControls from '@/components/VoiceControls';
 import { curriculumAPI, profileAPI } from '@/services/api';
+import voiceService from '@/services/voice.service';
 import type { Curriculum, UserProfile } from '@/types';
 
 type FlowStage = 'greeting' | 'question' | 'generating' | 'presenting' | 'complete';
@@ -36,17 +37,11 @@ export default function AIIntroNew() {
       const introData = await curriculumAPI.getIntroduction();
       setIntroduction(introData.introduction);
 
-      // Simulate AI speaking
+      // Speak introduction using 11 Labs or browser TTS
       setTutorStatus('speaking');
-
-      // Use Web Speech API for text-to-speech (fallback)
-      speakText(introData.introduction);
-
-      // After introduction, move to question stage
-      setTimeout(() => {
-        setTutorStatus('idle');
-        setStage('question');
-      }, 5000); // Adjust based on introduction length
+      await speakText(introData.introduction, 'en');
+      setTutorStatus('idle');
+      setStage('question');
 
       setIsLoading(false);
     } catch (err) {
@@ -56,15 +51,12 @@ export default function AIIntroNew() {
     }
   };
 
-  const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.rate = 0.9;
-      utterance.onend = () => {
-        setTutorStatus('idle');
-      };
-      window.speechSynthesis.speak(utterance);
+  const speakText = async (text: string, language: 'en' | 'fr' = 'en') => {
+    try {
+      await voiceService.speak({ text, language });
+    } catch (error) {
+      console.error('Speech error:', error);
+      setTutorStatus('idle');
     }
   };
 
@@ -81,12 +73,9 @@ export default function AIIntroNew() {
       // Present curriculum
       setTutorStatus('speaking');
       const presentationText = `Okay! I've created a ${curriculumData.curriculum.weeksDuration}-week program designed specifically for you. Here's how we'll work together...`;
-      speakText(presentationText);
-
-      setTimeout(() => {
-        setStage('presenting');
-        setTutorStatus('idle');
-      }, 3000);
+      await speakText(presentationText, 'en');
+      setStage('presenting');
+      setTutorStatus('idle');
     } catch (err) {
       console.error('Failed to generate curriculum:', err);
       setError('Failed to generate curriculum. Please try again.');
@@ -112,9 +101,7 @@ export default function AIIntroNew() {
         isMuted={isMuted}
         onToggleMute={() => setIsMuted(!isMuted)}
         onInterrupt={() => {
-          if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-          }
+          voiceService.stop();
           setTutorStatus('idle');
         }}
       />
