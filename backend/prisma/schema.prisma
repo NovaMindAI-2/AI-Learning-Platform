@@ -1,0 +1,140 @@
+// Prisma Schema for AI Language Learning Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User authentication and account info
+model User {
+  id                   String    @id @default(uuid())
+  email                String    @unique
+  passwordHash         String    @map("password_hash")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  lastLogin            DateTime? @map("last_login")
+  onboardingCompleted  Boolean   @default(false) @map("onboarding_completed")
+
+  // Relations
+  profile              UserProfile?
+  curriculum           Curriculum?
+  knowledge            UserKnowledge[]
+  lessonSessions       LessonSession[]
+
+  @@map("users")
+}
+
+// User learning preferences and profile
+model UserProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique @map("user_id")
+  targetLanguage    String   @default("french") @map("target_language")
+  currentLevel      String   @map("current_level") // beginner, A1, A2, B1, B2, C1, C2
+  learningGoal      String   @map("learning_goal") // business_trip, tourism, conversation, academic, fluency
+  timelineWeeks     Int      @map("timeline_weeks")
+  studyFrequency    String   @map("study_frequency") // daily, 3x_week, 2x_week, weekly
+  sessionDuration   Int      @map("session_duration") // minutes
+  includesHomework  Boolean  @map("includes_homework")
+  tutorPersonality  String   @map("tutor_personality") // encouraging, sarcastic, detail_oriented, fun, formal
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// Personalized curriculum for each user
+model Curriculum {
+  id                String   @id @default(uuid())
+  userId            String   @unique @map("user_id")
+  totalLessons      Int      @map("total_lessons")
+  weeksDuration     Int      @map("weeks_duration")
+  lessonsPerWeek    Int      @map("lessons_per_week")
+  curriculumSummary String   @map("curriculum_summary") @db.Text // JSON structure
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessons           Lesson[]
+
+  @@map("curriculum")
+}
+
+// Individual lessons
+model Lesson {
+  id               String    @id @default(uuid())
+  curriculumId     String    @map("curriculum_id")
+  lessonNumber     Int       @map("lesson_number")
+  title            String
+  description      String    @db.Text
+  objectives       String    @db.Text // JSON array
+  content          String    @db.Text // JSON with lesson structure
+  durationMinutes  Int       @map("duration_minutes")
+  completed        Boolean   @default(false)
+  completedAt      DateTime? @map("completed_at")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  curriculum       Curriculum      @relation(fields: [curriculumId], references: [id], onDelete: Cascade)
+  sessions         LessonSession[]
+
+  @@unique([curriculumId, lessonNumber])
+  @@map("lessons")
+}
+
+// User's knowledge base - what they've learned
+model UserKnowledge {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  knowledgeType   String   @map("knowledge_type") // vocabulary, grammar, phrase, skill
+  content         String   @db.Text // the actual word/phrase/concept
+  context         String   @db.Text // where/how it was learned
+  confidenceScore Float    @map("confidence_score") @default(0.5) // 0-1 scale
+  lastReviewed    DateTime @map("last_reviewed") @default(now())
+  timesPracticed  Int      @map("times_practiced") @default(0)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, knowledgeType])
+  @@map("user_knowledge")
+}
+
+// Track individual lesson sessions
+model LessonSession {
+  id                   String    @id @default(uuid())
+  userId               String    @map("user_id")
+  lessonId             String    @map("lesson_id")
+  startedAt            DateTime  @default(now()) @map("started_at")
+  completedAt          DateTime? @map("completed_at")
+  durationMinutes      Int?      @map("duration_minutes")
+  performanceSummary   String?   @map("performance_summary") @db.Text // JSON with metrics
+  conversationTranscript String? @map("conversation_transcript") @db.Text
+
+  // Relations
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson               Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_sessions")
+}
+
+// Optional: Password reset tokens
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([token])
+  @@map("password_reset_tokens")
+}
