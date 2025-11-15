@@ -86,3 +86,62 @@ export interface TutorIntroduction {
   tutorName: string;
   personality: string;
 }
+
+// Dashboard types
+export interface DashboardStats {
+  totalLessons: number;
+  completedLessons: number;
+  knowledgeCount: number;
+  totalStudyMinutes: number;
+  currentStreak: number;
+  progressPercentage: number;
+}
+
+export interface KnowledgeItem {
+  id: string;
+  userId: string;
+  knowledgeType: string;
+  content: string;
+  context: string;
+  confidenceScore: number;
+  lastReviewed: string;
+  timesPracticed: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LessonSession {
+  id: string;
+  userId: string;
+  lessonId: string;
+  startedAt: string;
+  completedAt: string | null;
+  durationMinutes: number | null;
+  performanceSummary: string | null;
+  lesson: {
+    id: string;
+    lessonNumber: number;
+    title: string;
+    objectives: string[];
+  } | null;
+}
+
+export interface DashboardData {
+  user: {
+    email: string;
+    onboardingCompleted: boolean;
+  };
+  profile: UserProfile | null;
+  stats: DashboardStats;
+  curriculum: Curriculum | null;
+  knowledgeItems: KnowledgeItem[];
+  recentSessions: LessonSession[];
+  nextLesson: {
+    id: string;
+    lessonNumber: number;
+    title: string;
+    description: string;
+    objectives: string[];
+    durationMinutes: number;
+  } | null;
+}

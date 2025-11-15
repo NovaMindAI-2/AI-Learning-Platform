@@ -7,7 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import Onboarding from '@/pages/Onboarding';
-import Dashboard from '@/pages/Dashboard';
+import Dashboard from '@/pages/DashboardNew';
 import AIIntro from '@/pages/AIIntroNew';
 
 function App() {

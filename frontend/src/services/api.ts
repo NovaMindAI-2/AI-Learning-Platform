@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, LoginCredentials, SignupCredentials, UserProfile, Curriculum, TutorIntroduction } from '@/types';
+import type { AuthResponse, LoginCredentials, SignupCredentials, UserProfile, Curriculum, TutorIntroduction, DashboardData, KnowledgeItem } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -78,6 +78,23 @@ export const curriculumAPI = {
 
   getIntroduction: async (): Promise<TutorIntroduction> => {
     const { data } = await api.get('/curriculum/intro');
+    return data;
+  },
+};
+
+// Dashboard API
+export const dashboardAPI = {
+  getData: async (): Promise<DashboardData> => {
+    const { data } = await api.get('/dashboard');
+    return data;
+  },
+
+  getKnowledge: async (params?: {
+    type?: string;
+    search?: string;
+    limit?: number;
+  }): Promise<{ items: KnowledgeItem[]; grouped: Record<string, KnowledgeItem[]>; total: number }> => {
+    const { data } = await api.get('/dashboard/knowledge', { params });
     return data;
   },
 };
