@@ -8,7 +8,7 @@ import Login from '@/pages/Login';
 import Signup from '@/pages/Signup';
 import Onboarding from '@/pages/Onboarding';
 import Dashboard from '@/pages/Dashboard';
-import AIIntro from '@/pages/AIIntro';
+import AIIntro from '@/pages/AIIntroNew';
 
 function App() {
   const { checkAuth } = useAuthStore();

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, LoginCredentials, SignupCredentials, UserProfile } from '@/types';
+import type { AuthResponse, LoginCredentials, SignupCredentials, UserProfile, Curriculum, TutorIntroduction } from '@/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
@@ -60,6 +60,24 @@ export const profileAPI = {
 
   get: async () => {
     const { data } = await api.get('/profile');
+    return data;
+  },
+};
+
+// Curriculum API
+export const curriculumAPI = {
+  generate: async (): Promise<{ curriculum: Curriculum }> => {
+    const { data } = await api.post('/curriculum/generate');
+    return data;
+  },
+
+  get: async (): Promise<{ curriculum: Curriculum }> => {
+    const { data } = await api.get('/curriculum');
+    return data;
+  },
+
+  getIntroduction: async (): Promise<TutorIntroduction> => {
+    const { data } = await api.get('/curriculum/intro');
     return data;
   },
 };

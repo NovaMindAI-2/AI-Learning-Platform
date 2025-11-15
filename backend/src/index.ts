@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config } from './config/env';
 import authRoutes from './routes/auth.routes';
 import profileRoutes from './routes/profile.routes';
+import curriculumRoutes from './routes/curriculum.routes';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/curriculum', curriculumRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -48,3 +48,41 @@ export interface OnboardingFormData {
   includesHomework: boolean;
   tutorPersonality: UserProfile['tutorPersonality'];
 }
+
+// Curriculum types
+export interface Lesson {
+  lessonNumber: number;
+  title: string;
+  objectives: string[];
+  duration: number;
+  topics: string[];
+}
+
+export interface CurriculumWeek {
+  weekNumber: number;
+  theme: string;
+  lessons: Lesson[];
+}
+
+export interface Curriculum {
+  id: string;
+  userId: string;
+  totalLessons: number;
+  weeksDuration: number;
+  lessonsPerWeek: number;
+  curriculumSummary: {
+    totalLessons: number;
+    weeksDuration: number;
+    lessonsPerWeek: number;
+    weeks: CurriculumWeek[];
+    summary: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TutorIntroduction {
+  introduction: string;
+  tutorName: string;
+  personality: string;
+}
